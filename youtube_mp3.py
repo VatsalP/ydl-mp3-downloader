@@ -1,30 +1,35 @@
 import logging
 import os
+import re
 
 import youtube_dl
 from bottle import Bottle, run, static_file, \
-                debug, request, mako_view as view
+                debug, request, mako_view as view, \
+                mako_template as template
 
 
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
 logging.basicConfig(filename='ze.log', level=logging.DEBUG)
 app = Bottle()
+# regex for youtube links
+regexp = re.compile(r"(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})")
 
 
 class Logger(object):
     def debug(self, msg):
-        logging.debug("Message: {}".format(msg))
+        pass
 
     def warning(self, msg):
-        logging.warning("Message: {}".format(msg))
+        logging.warning("Warning Message: {}".format(msg))
 
     def error(self, msg):
-        logging.error("Message: {}".format(msg))
+        logging.error("Error Message: {}".format(msg))
 
 
 YDL_OPTS = {
     'format': 'bestaudio/best',
+    'outtmpl': dir_path + "/"+"download/" + "%(id)s.%(ext)s",
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -34,18 +39,10 @@ YDL_OPTS = {
 }
 
 
-@app.get('/')
+@app.post('/')
 @view('index.html')
 def index():
     return
-    """
-    return 
-        Enter URL:
-        <form method='post' action='/download'>
-            <input type='text' placeholder='Enter url' name='url'>
-            <input type="submit" value="Submit">
-        </form>
-    """
 
 
 @app.get('/<filepath:path>')
@@ -56,19 +53,24 @@ def static_files(filepath):
     )
 
 
-# regex for youtube links
-# ^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$
-# https://stackoverflow.com/questions/19377262/regex-for-youtube-url
 @app.post('/download')
 def download():
     """Serves mp3s for download
     """
     url = request.forms.get('url')
-    with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
-        info = ydl.extract_info(url)
-
-    filename = info['title'] + '-' + info['id'] + '.mp3'
-    return static_file(filename, root=".", download=filename)
+    url_match = regexp.match(url)
+    if url_match:
+        url = url_match.group()
+        with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
+            info = ydl.extract_info(url)
+        filename = info['title'] + '.mp3'
+        return static_file(
+            info['id'] + '.mp3',
+            root=dir_path+'/'+'download/',
+            download=filename
+        )
+    else:
+        return template('index.html', {})
 
 if __name__ == '__main__':
     run(app, reloader=True)
