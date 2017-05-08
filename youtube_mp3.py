@@ -39,12 +39,6 @@ YDL_OPTS = {
 }
 
 
-@app.post('/')
-@view('index.html')
-def index():
-    return
-
-
 @app.get('/<filepath:path>')
 def static_files(filepath):
     return static_file(
@@ -53,12 +47,20 @@ def static_files(filepath):
     )
 
 
-@app.post('/download')
+@app.get('/')
+@view('index.html')
+def index():
+    return {
+        'error': False,
+    }
+
+
+@app.post('/')
 def download():
     """Serves mp3s for download
     """
     url = request.forms.get('url')
-    url_match = regexp.match(url)
+    url_match = regexp.search(url)
     if url_match:
         url = url_match.group()
         with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
@@ -70,7 +72,9 @@ def download():
             download=filename
         )
     else:
-        return template('index.html', {})
+        return template(
+            'index.html', {'error': True,}
+        )
 
 if __name__ == '__main__':
     run(app, reloader=True)

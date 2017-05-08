@@ -12,15 +12,31 @@
 
 <body>
     <header>
-        <h3>Get mp3 files from YouTube videos</h3>
+        <h3>MP3 from YouTube videos</h3>
     </header>
 
-    <article>
-        <form method='post' action='/download'>
-            <p>Enter youtube url</p>
+    <%def name="form()">
+        <form method='post' action='/'>
+            <p>Enter YouTube url</p>
             <input type='text' placeholder='Enter url' name='url'>
             <input type="submit" value="Submit">
         </form>
+    </%def>
+
+    <article>
+        %if error:
+        <code>
+        The url was invalid
+        Please enter valid url.
+        Examples:
+        https://www.youtube.com/watch?v=T5Xl0Qry-hA
+        https://youtu.be/B_Vs37KtNpE
+        </code>
+        <p></p>
+        ${form()}
+        % else:
+        ${form()}
+        % endif
     </article>
 
     <footer>
