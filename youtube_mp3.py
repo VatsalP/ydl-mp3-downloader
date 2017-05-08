@@ -1,12 +1,16 @@
+import logging
+
 import youtube_dl
-from bottle import Bottle, run, static_file, debug, request
+from bottle import Bottle, run, static_file, \
+                debug, request, mako_view as view
 
-
+logging.basicConfig(filename='ze.log', level=logging.DEBUG)
 app = Bottle()
 debug(True)
 
 
 @app.get('/')
+@view('index.html')
 def index():
     return """
         Enter URL:
@@ -16,37 +20,39 @@ def index():
         </form>
         """
 
-class MyLogger(object):
+
+class Logger(object):
     def debug(self, msg):
-        pass
+        logging.debug("Message: {}".format(msg))
 
     def warning(self, msg):
-        pass
+        logging.warning("Message: {}".format(msg))
 
     def error(self, msg):
-        print(msg)
+        logging.error("Message: {}".format(msg))
 
 YDL_OPTS = {
     'format': 'bestaudio/best',
-#    'outtmpl': "%(title)s.%(ext)s",
+#   'outtmpl': "%(title)s.%(ext)s",
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
         'preferredquality': '192',
     }],
-    'logger': MyLogger(),
+    'logger': Logger(),
 }
 
 
 @app.post('/download')
 def download():
+    """Serves mp3s for download
+    """
     url = request.forms.get('url')
-    print(url)
-    print(type(url))
     with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
         info = ydl.extract_info(url)
 
     filename = info['title'] + '-' + info['id'] + '.mp3'
     return static_file(filename, root=".", download=filename)
 
-run(app, reloader=True)
+if '__name__' == __main__:
+    run(app, reloader=True)

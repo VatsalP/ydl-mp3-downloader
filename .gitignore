@@ -25,3 +25,5 @@ sphinx/source/_build
 *.sqlite
 
 /ffmpeg
+
+*.log
