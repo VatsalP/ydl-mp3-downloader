@@ -27,3 +27,5 @@ sphinx/source/_build
 /ffmpeg
 
 *.log
+
+*.mp3

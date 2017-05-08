@@ -5,11 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Youtube mp3 downloader(using youtube-dl)</title>
+    <title>YouTube mp3 downloader(using youtube-dl)</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/sakura.css">
 </head>
 
 <body>
+    <header>
+        <h3>Get mp3 files from YouTube videos</h3>
+    </header>
 
+    <article>
+        <form method='post' action='/download'>
+            <p>Enter youtube url</p>
+            <input type='text' placeholder='Enter url' name='url'>
+            <input type="submit" value="Submit">
+        </form>
+    </article>
+
+    <footer>
+        <p>&copy; Copyright 2016 <a href="https://github.com/vatsalp" title="Github Profile">Vatsal Parekh</a></p>
+    </footer>
 </body>
 
 </html>
