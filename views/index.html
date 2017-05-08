@@ -24,18 +24,25 @@
     </%def>
 
     <article>
-        %if error:
-        <code>
-        The url was invalid
-        Please enter valid url.
-        Examples:
-        https://www.youtube.com/watch?v=T5Xl0Qry-hA
-        https://youtu.be/B_Vs37KtNpE
-        </code>
-        <p></p>
-        ${form()}
+        % if error:
+            <code>
+            The url was invalid
+            Please enter valid url.
+            Examples:
+            https://www.youtube.com/watch?v=T5Xl0Qry-hA
+            https://youtu.be/B_Vs37KtNpE
+            </code>
+            <p></p>
+            ${form()}
         % else:
-        ${form()}
+            % if download:
+                <p>Here is your download link :D</p>
+                <p><a href="download/${link}" download="${dwname}">Click me</a></p>
+                <p>Download another mp3!</p>
+                ${form()}
+            % else:
+                ${form()}
+            % endif
         % endif
     </article>
 

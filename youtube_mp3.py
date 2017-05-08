@@ -29,7 +29,7 @@ class Logger(object):
 
 YDL_OPTS = {
     'format': 'bestaudio/best',
-    'outtmpl': dir_path + "/"+"download/" + "%(id)s.%(ext)s",
+    'outtmpl': dir_path + "/"+"static/download/" + "%(id)s.%(ext)s",
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -46,17 +46,28 @@ def static_files(filepath):
         root=dir_path+'/'+'static/'
     )
 
+"""
+@app.get('/download/<filepath:path>')
+def download(filepath):
+    print(filepath)
+    return static_file(
+            filepath,
+            root=dir_path+'/'+'download/'
+        )
+"""
 
 @app.get('/')
 @view('index.html')
 def index():
     return {
         'error': False,
+        'download': False,
     }
 
 
 @app.post('/')
-def download():
+@view('index.html')
+def index():
     """Serves mp3s for download
     """
     url = request.forms.get('url')
@@ -66,15 +77,14 @@ def download():
         with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
             info = ydl.extract_info(url)
         filename = info['title'] + '.mp3'
-        return static_file(
-            info['id'] + '.mp3',
-            root=dir_path+'/'+'download/',
-            download=filename
-        )
+        return {
+            'error': False,
+            'download': True,
+            'link': info['id'] + '.mp3',
+            'dwname': info['title'] + '.mp3',
+        }
     else:
-        return template(
-            'index.html', {'error': True,}
-        )
+        return {'error': True}
 
 if __name__ == '__main__':
     run(app, reloader=True)
