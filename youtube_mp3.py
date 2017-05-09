@@ -4,8 +4,7 @@ import re
 
 import youtube_dl
 from bottle import Bottle, run, static_file, \
-                debug, request, mako_view as view, \
-                mako_template as template
+                request, mako_view as view
 
 
 path = os.path.abspath(__file__)
@@ -41,10 +40,13 @@ YDL_OPTS = {
 
 @app.get('/<filepath:path>')
 def static_files(filepath):
+    if 'download' in filepath:
+        filepath += '.mp3'
     return static_file(
         filepath,
         root=dir_path+'/'+'static/'
     )
+
 
 """
 @app.get('/download/<filepath:path>')
@@ -55,6 +57,7 @@ def download(filepath):
             root=dir_path+'/'+'download/'
         )
 """
+
 
 @app.get('/')
 @view('index.html')
@@ -76,15 +79,15 @@ def index():
         url = url_match.group()
         with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
             info = ydl.extract_info(url)
-        filename = info['title'] + '.mp3'
         return {
             'error': False,
             'download': True,
-            'link': info['id'] + '.mp3',
+            'link': info['id'],
             'dwname': info['title'] + '.mp3',
         }
     else:
         return {'error': True}
+
 
 if __name__ == '__main__':
     run(app, reloader=True)
