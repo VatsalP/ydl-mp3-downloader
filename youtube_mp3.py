@@ -48,17 +48,6 @@ def static_files(filepath):
     )
 
 
-"""
-@app.get('/download/<filepath:path>')
-def download(filepath):
-    print(filepath)
-    return static_file(
-            filepath,
-            root=dir_path+'/'+'download/'
-        )
-"""
-
-
 @app.get('/')
 @view('index.html')
 def index():
