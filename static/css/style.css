@@ -6,4 +6,13 @@ header {
 article {
     width: 60%;
     margin: 10% auto;
+    text-align: center;
+}
+
+code {
+    text-align: left;
+}
+
+footer {
+    text-align: center;
 }
